@@ -17,5 +17,5 @@ class Animal(Model):
     age = FloatField()
     weight = FloatField()
     sex = CharField(max_length=30)
-    group = ForeignKey(Group, on_delete=CASCADE)
+    group = ForeignKey(Group, on_delete=CASCADE, null=True)
     characteristics = ManyToManyField(Characteristic)
