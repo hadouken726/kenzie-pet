@@ -1,3 +1,4 @@
+from api.models import Animal
 from rest_framework.serializers import Serializer, CharField, FloatField, IntegerField
 
 
@@ -20,3 +21,5 @@ class AnimalSerializer(Serializer):
     sex = CharField(max_length=30)
     group = GroupSerializer(read_only=True)
     characteristics = CharacteristicSerializer(many=True, read_only=True)
+    def create(self, validated_data):
+        return Animal.objects.create(**validated_data)
