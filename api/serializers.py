@@ -1,4 +1,5 @@
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models.fields.related import RelatedField
 from rest_framework import serializers
 from api.models import Animal, Characteristic, Group
 from rest_framework.serializers import Serializer, CharField, FloatField, IntegerField
@@ -7,16 +8,12 @@ from rest_framework.serializers import Serializer, CharField, FloatField, Intege
 class CharacteristicSerializer(Serializer):
     id = IntegerField(read_only=True)
     name = CharField(max_length=255)
-    def create(self, validated_data):
-        return Characteristic.objects.create(**validated_data)
 
 
 class GroupSerializer(Serializer):
     id = IntegerField(read_only=True)
     name = CharField(max_length=100)
     scientific_name = CharField(max_length=100)
-    def create(self, validated_data):
-        return Group.objects.create(**validated_data)
 
 
 class AnimalSerializer(Serializer):
@@ -33,15 +30,14 @@ class AnimalSerializer(Serializer):
         try:
             group = Group.objects.get(scientific_name=group_data.get('scientific_name'))
         except ObjectDoesNotExist:
-            group = GroupSerializer().create(group_data)
+            group = GroupSerializer(**group_data)
         characteristics = []
         for char in chars_data:
             try:
                 characteristic = Characteristic.objects.get(name=char.get('name'))
             except ObjectDoesNotExist:
-                characteristic = CharacteristicSerializer().create(char)    
+                characteristic = CharacteristicSerializer(**char)   
             characteristics.append(characteristic)
-        animal = Animal.objects.create(**validated_data)
-        animal.group = group
+        animal = Animal.objects.create(group=group, **validated_data)
         animal.characteristics.set(characteristics) 
         return animal
